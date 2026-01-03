@@ -1,5 +1,7 @@
 # Gnome Alarms
 
+Panel indicator for GNOME Shell showing the next alarm from Gnome Clocks and offering a quick-open control.
+
 This GNOME Shell extension was created for personal use and inspired by [pacoqueen/gnome-shell-alarm](https://github.com/pacoqueen/gnome-shell-alarm).
 
 
