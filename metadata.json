@@ -1,0 +1,8 @@
+{
+  "name": "Gnome Alarms",
+  "description": "Allow visual control Gnome Clock's alarms",
+  "uuid": "gnome-alarms@igolskyi.github.io",
+  "shell-version": [
+    "46"
+  ]
+}
