@@ -34,7 +34,7 @@ const GnomeAlarmsIndicator = GObject.registerClass(
     { GTypeName: 'GnomeAlarmsIndicator' },
     class GnomeAlarmsIndicator extends PanelMenu.Button {
         _init() {
-            super._init(0.0, _('Gnome Alarms indicator'));
+            super._init(0.0, _('Gnome Alarms indicator'), true);
 
             let box = new St.BoxLayout({
                 style_class: 'panel-status-indicators-box',
@@ -54,10 +54,12 @@ const GnomeAlarmsIndicator = GObject.registerClass(
             box.add_child(this.label);
             this.add_child(box);
 
-            this.connect(
-                'button-press-event',
-                this._onButtonPressed.bind(this),
-            );
+            this._clickGesture = new Clutter.ClickGesture();
+            this._clickGesture.set_recognize_on_press(true);
+            this._clickGesture.connect('recognize', () => {
+                this._onButtonPressed();
+            });
+            this.add_action(this._clickGesture);
 
             this.clockSettings = getClocksSettings();
             this._alarmChangedId = 0;

@@ -21,20 +21,31 @@ export const showAlarms = clockSettings => {
     const MyClockIface = `<node>
         <interface name="org.freedesktop.Application">
             <method name="Activate">
-                <arg type="a{sv}" name="platform-data" direction="in"/>
+                <arg type="a{sv}" name="platform_data" direction="in"/>
             </method>
         </interface>
     </node>`;
     const MyClockProxy = Gio.DBusProxy.makeProxyWrapper(MyClockIface);
-
     new MyClockProxy(
         Gio.DBus.session,
         'org.gnome.clocks',
         '/org/gnome/clocks',
         (proxy, error) => {
-            if (error) return console.error('Error creating proxy:', error);
-            proxy.ActivateRemote((_, err) => {
-                if (err) console.error('Error activating Clocks:', err);
+            if (error) {
+                console.error(
+                    'Gnome Alarms: Error creating org.gnome.clocks proxy',
+                    error,
+                );
+                return;
+            }
+
+            proxy.ActivateRemote({}, (_result, activateError) => {
+                if (activateError) {
+                    console.error(
+                        'Gnome Alarms: Error activating Clocks',
+                        activateError,
+                    );
+                }
             });
         },
     );
