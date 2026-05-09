@@ -1,6 +1,6 @@
 {
     "name": "gnome-alarms",
-    "version": "1.0.0",
+    "version": "1.0.1-0",
     "description": "GNOME Shell panel indicator showing the next alarm from Gnome Clocks and quick-open control.",
     "main": "extension.js",
     "scripts": {
