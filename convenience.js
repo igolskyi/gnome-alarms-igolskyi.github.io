@@ -15,7 +15,7 @@ export const getClocksSettings = () => {
 /**
  * Opens the gnome.org.clocks window via dbus.
  */
-export const showAlarms = (clockSettings) => {
+export const showAlarms = clockSettings => {
     if (!clockSettings) return;
 
     const MyClockIface = `<node>
@@ -43,7 +43,7 @@ export const showAlarms = (clockSettings) => {
 /**
  * Converts minutes to a string like 1d 07h 53m.
  */
-export const minutesToString = (min) => {
+export const minutesToString = min => {
     const totalMin = Math.max(0, parseInt(min, 10));
     if (totalMin === 0) return '';
 
@@ -62,12 +62,12 @@ export const minutesToString = (min) => {
 /**
  * Unpacks GVariant boxed values if necessary.
  */
-const safeUnpack = (v) => {
+const safeUnpack = v => {
     if (v && typeof v.unpack === 'function') return v.unpack();
     return v;
 };
 
-const getDayNum = (dayNum) => {
+const getDayNum = dayNum => {
     if (dayNum > 7) return dayNum - 7;
     return dayNum === 0 ? 7 : dayNum;
 };
@@ -80,7 +80,7 @@ const filterNearest = (alarms, iteration) => {
     const nowDay = getDayNum(day);
 
     return alarms
-        .map((alarm) => {
+        .map(alarm => {
             const ringTime = new Date(now);
             ringTime.setDate(now.getDate() + iteration);
             ringTime.setHours(alarm.hour, alarm.minute, 0, 0);
@@ -97,14 +97,14 @@ const filterNearest = (alarms, iteration) => {
                 diffMinutes,
             };
         })
-        .filter((a) => a);
+        .filter(a => a);
 };
 
-export const getNextAlarm = (alarmsPacked) => {
+export const getNextAlarm = alarmsPacked => {
     const rawAlarms = alarmsPacked.deep_unpack() || [];
 
     const alarms = rawAlarms
-        .map((obj) => ({
+        .map(obj => ({
             name: safeUnpack(obj.name),
             hour: safeUnpack(obj.hour),
             minute: safeUnpack(obj.minute),
@@ -113,7 +113,7 @@ export const getNextAlarm = (alarmsPacked) => {
             ring_time: safeUnpack(obj.ring_time),
         }))
         // An alarm is active if 'active' is not false AND it has a ring_time
-        .filter((a) => a.active !== false && a.ring_time);
+        .filter(a => a.active !== false && a.ring_time);
 
     for (let i = 0; i < 8; i++) {
         const nearestAlarm = filterNearest(alarms, i);

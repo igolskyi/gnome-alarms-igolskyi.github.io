@@ -4,11 +4,15 @@
     "description": "GNOME Shell panel indicator showing the next alarm from Gnome Clocks and quick-open control.",
     "main": "extension.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix",
+        "format:check": "oxfmt --check",
+        "format": "oxfmt --no-error-on-unmatched-pattern"
     },
     "devDependencies": {
-        "@eslint/js": "^9.2.0",
-        "eslint": "^9.2.0",
-        "globals": "^15.1.0"
+        "globals": "^15.1.0",
+        "oxfmt": "^0.48.0",
+        "oxlint": "^1.63.0"
     }
 }
