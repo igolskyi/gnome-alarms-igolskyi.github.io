@@ -26,7 +26,12 @@ import {
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
-import { getClocksSettings, showAlarms, getNextAlarm } from './convenience.js';
+import {
+    getClocksSettings,
+    getSettings,
+    showAlarms,
+    getNextAlarm,
+} from './convenience.js';
 
 const DEFAULT_TEXT = '';
 
@@ -156,9 +161,10 @@ const GnomeAlarmsIndicator = GObject.registerClass(
 export default class GnomeAlarmsExtension extends Extension {
     enable() {
         const refreshInterval = 60 * 1000; // One minute
+        this._settings = getSettings(this);
 
         this._indicator = new GnomeAlarmsIndicator();
-        Main.panel.addToStatusArea(this.uuid, this._indicator);
+        this._addIndicator();
 
         // First refresh
         this._indicator.refresh();
@@ -167,9 +173,46 @@ export default class GnomeAlarmsExtension extends Extension {
             this._indicator.refresh();
             return true;
         });
+
+        this._settingsChangedId = this._settings.connect(
+            'changed::position',
+            () => {
+                this._readdIndicator();
+            },
+        );
+        this._settingsIndexChangedId = this._settings.connect(
+            'changed::position-index',
+            () => {
+                this._readdIndicator();
+            },
+        );
+    }
+
+    _addIndicator() {
+        const position = this._settings.get_string('position');
+        const index = this._settings.get_int('position-index');
+        Main.panel.addToStatusArea(this.uuid, this._indicator, index, position);
+    }
+
+    _readdIndicator() {
+        // We can't easily "move" it, so we remove and add back
+        Main.panel.statusArea[this.uuid] = null;
+        this._indicator.destroy();
+        this._indicator = new GnomeAlarmsIndicator();
+        this._addIndicator();
+        this._indicator.refresh();
     }
 
     disable() {
+        if (this._settingsChangedId) {
+            this._settings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = 0;
+        }
+        if (this._settingsIndexChangedId) {
+            this._settings.disconnect(this._settingsIndexChangedId);
+            this._settingsIndexChangedId = 0;
+        }
+
         GLib.source_remove(this._timeout);
 
         if (!this._indicator.clockSettings) {

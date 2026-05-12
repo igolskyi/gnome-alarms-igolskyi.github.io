@@ -12,6 +12,10 @@ export const getClocksSettings = () => {
     }
 };
 
+export const getSettings = extension => {
+    return extension.getSettings('org.gnome.shell.extensions.gnome-alarms');
+};
+
 /**
  * Opens the gnome.org.clocks window via dbus.
  */

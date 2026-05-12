@@ -2,5 +2,6 @@
     "name": "Gnome Alarms",
     "description": "Allow visual control Gnome Clock's alarms",
     "uuid": "gnome-alarms@igolskyi.github.io",
+    "settings-schema": "org.gnome.shell.extensions.gnome-alarms",
     "shell-version": ["46", "47", "50"]
 }

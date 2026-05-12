@@ -1,0 +1,14 @@
+<schemalist>
+  <schema id="org.gnome.shell.extensions.gnome-alarms" path="/org/gnome/shell/extensions/gnome-alarms/">
+    <key name="position" type="s">
+      <default>'right'</default>
+      <summary>Indicator position</summary>
+      <description>The position of the indicator in the panel (left, center, right).</description>
+    </key>
+    <key name="position-index" type="i">
+      <default>0</default>
+      <summary>Position index</summary>
+      <description>The index within the panel section.</description>
+    </key>
+  </schema>
+</schemalist>
