@@ -26,6 +26,7 @@ import {
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import {
     getClocksSettings,
     getSettings,
@@ -38,8 +39,9 @@ const DEFAULT_TEXT = '';
 const GnomeAlarmsIndicator = GObject.registerClass(
     { GTypeName: 'GnomeAlarmsIndicator' },
     class GnomeAlarmsIndicator extends PanelMenu.Button {
-        _init() {
-            super._init(0.0, _('Gnome Alarms indicator'), true);
+        _init(extension) {
+            super._init(0.5, _('Gnome Alarms indicator'), false);
+            this._extension = extension;
 
             let box = new St.BoxLayout({
                 style_class: 'panel-status-indicators-box',
@@ -59,16 +61,27 @@ const GnomeAlarmsIndicator = GObject.registerClass(
             box.add_child(this.label);
             this.add_child(box);
 
-            this._clickGesture = new Clutter.ClickGesture();
-            this._clickGesture.set_recognize_on_press(true);
-            this._clickGesture.connect('recognize', () => {
-                this._onButtonPressed();
-            });
-            this.add_action(this._clickGesture);
+            this._buildMenu();
 
             this.clockSettings = getClocksSettings();
             this._alarmChangedId = 0;
             this._connectClocksSignal();
+        }
+
+        _buildMenu() {
+            const alarmsItem = new PopupMenu.PopupMenuItem(_('Clocks...'));
+            alarmsItem.connect('activate', () => {
+                showAlarms(this.clockSettings);
+            });
+            this.menu.addMenuItem(alarmsItem);
+
+            this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+            const settingsItem = new PopupMenu.PopupMenuItem(_('Settings...'));
+            settingsItem.connect('activate', () => {
+                this._extension.openPreferences();
+            });
+            this.menu.addMenuItem(settingsItem);
         }
 
         /**
@@ -118,7 +131,6 @@ const GnomeAlarmsIndicator = GObject.registerClass(
          */
         _onButtonPressed() {
             this._updateLabel();
-            showAlarms(this.clockSettings);
         }
 
         /**
@@ -163,7 +175,7 @@ export default class GnomeAlarmsExtension extends Extension {
         const refreshInterval = 60 * 1000; // One minute
         this._settings = getSettings(this);
 
-        this._indicator = new GnomeAlarmsIndicator();
+        this._indicator = new GnomeAlarmsIndicator(this);
         this._addIndicator();
 
         // First refresh
@@ -198,7 +210,7 @@ export default class GnomeAlarmsExtension extends Extension {
         // We can't easily "move" it, so we remove and add back
         Main.panel.statusArea[this.uuid] = null;
         this._indicator.destroy();
-        this._indicator = new GnomeAlarmsIndicator();
+        this._indicator = new GnomeAlarmsIndicator(this);
         this._addIndicator();
         this._indicator.refresh();
     }
