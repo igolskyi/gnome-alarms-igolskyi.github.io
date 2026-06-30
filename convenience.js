@@ -1,19 +1,13 @@
 import Gio from 'gi://Gio';
 
 export const getClocksSettings = () => {
-    try {
-        return new Gio.Settings({ schema: 'org.gnome.clocks' });
-    } catch {
-        throw new Error(`
-    =======================================================================
-    Gnome Clocks is not installed natively, please check your installation!
-    (Snap or Flatpak are not supported!)
-    =======================================================================`);
+    const schemaId = 'org.gnome.clocks';
+    const schemaSource = Gio.SettingsSchemaSource.get_default();
+    if (schemaSource.lookup(schemaId, true)) {
+        return new Gio.Settings({ schema: schemaId });
     }
-};
-
-export const getSettings = extension => {
-    return extension.getSettings('org.gnome.shell.extensions.gnome-alarms');
+    console.warn('Gnome Alarms: org.gnome.clocks schema not found.');
+    return null;
 };
 
 /**
